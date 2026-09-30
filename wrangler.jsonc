@@ -1,0 +1,73 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "devhub",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // 静态资源目录：单页应用外壳 + 资源，非 /api 与动态路由由 ASSETS 直接托管
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    // 这些路径需要先经过 Worker：API、带 SEO 注入的博客/帖子页、RSS、站点地图
+    "run_worker_first": [
+      "/api/*",
+      "/media/*",
+      "/blog/*",
+      "/t/*",
+      "/feed.xml",
+      "/sitemap.xml",
+      "/robots.txt"
+    ]
+  },
+
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+  // 站点级公开配置（非敏感）
+  // 顶层即生产配置：默认 `wrangler deploy` 即为生产部署（会话 Cookie 自动带 Secure）。
+  // 本地开发由 .dev.vars 覆盖 ENVIRONMENT=development，见 .dev.vars.example。
+  "vars": {
+    "ENVIRONMENT": "production",
+    "SITE_NAME": "DevHub 技术社区",
+    "SITE_DESCRIPTION": "面向开发者的技术交流社区与官方博客",
+    "SITE_URL": "https://devhub.xxc2014.workers.dev",
+    "ALLOW_REGISTRATION": "true"
+  },
+
+  // 关系型数据：用户、论坛、博客、通知、审计、搜索索引
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "devhub-db",
+      "database_id": "b4b71c71-b16a-42d4-9b8f-36733bc1a92b",
+      "migrations_dir": "./migrations"
+    }
+  ],
+
+  // 键值存储：会话缓存、登录限流、热榜缓存
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "e9f24834a0f64075b5029f39483877ca"
+    }
+  ],
+
+  // 对象存储：头像、文章配图等用户上传文件
+  // 注意：R2 需先在 Cloudflare 控制台开通（账号未开通时部署会报错 10042）。
+  // 开通后取消下面注释并重新部署即可启用图片上传。
+  // "r2_buckets": [
+  //   {
+  //     "binding": "MEDIA",
+  //     "bucket_name": "devhub-media"
+  //   }
+  // ],
+
+  // 定时任务：每小时刷新热榜缓存、清理过期会话
+  "triggers": {
+    "crons": ["0 * * * *"]
+  }
+}

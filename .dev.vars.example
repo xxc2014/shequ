@@ -1,0 +1,13 @@
+# 本地开发环境变量示例。
+# 复制为 .dev.vars 后即可本地调试（.dev.vars 已被 .gitignore 忽略，切勿提交）。
+#
+# 说明：本项目无需任何密钥即可运行。
+# 会话令牌是「随机 32 字节 → SHA-256 哈希 → 存 D1 + KV」，不依赖签名密钥，
+# 因此没有 SESSION_SECRET 之类的必填 secret。
+
+# 覆盖 wrangler.jsonc 中的 ENVIRONMENT=production，
+# 让会话 Cookie 不带 Secure 属性（否则 http://localhost 无法登录）
+ENVIRONMENT=development
+
+# 会话有效期（秒），可选，默认 30 天
+SESSION_TTL=2592000

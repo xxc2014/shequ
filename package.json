@@ -1,0 +1,24 @@
+{
+  "name": "devhub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "技术社区 + 官方博客一体化站点，基于 Cloudflare Workers + 静态资源 + D1 + KV + R2",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "node scripts/build-assets.mjs",
+    "deploy": "wrangler deploy",
+    "deploy:dry": "wrangler deploy --dry-run",
+    "check": "wrangler check",
+    "types": "wrangler types",
+    "db:migrate:local": "wrangler d1 migrations apply devhub-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply devhub-db --remote",
+    "db:seed:local": "wrangler d1 execute devhub-db --local --file=./seed/seed.sql",
+    "db:seed:remote": "wrangler d1 execute devhub-db --remote --file=./seed/seed.sql",
+    "hash-password": "node scripts/hash-password.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.12",
+    "wrangler": "^4.143.0"
+  }
+}
